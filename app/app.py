@@ -1,15 +1,17 @@
+# import libraries
 import seaborn as sns
 from faicons import icon_svg
-
 from shiny import reactive
 from shiny.express import input, render, ui
 import palmerpenguins 
 
+# Load data
 df = palmerpenguins.load_penguins()
 
-ui.page_opts(title="Penguins dashboard", fillable=True)
+# App layout
+ui.page_opts(title="Penguins dashboard that demonstrates the I can use GitHub", fillable=True)
 
-
+# Sidebar
 with ui.sidebar(title="Filter controls"):
     ui.input_slider("mass", "Mass", 2000, 6000, 6000)
     ui.input_checkbox_group(
@@ -21,18 +23,23 @@ with ui.sidebar(title="Filter controls"):
     ui.hr()
     ui.h6("Links")
     ui.a(
-        "GitHub Source",
+        "Original GitHub Repo",
         href="https://github.com/denisecase/cintel-07-tdash",
         target="_blank",
     )
     ui.a(
+        "My GitHub Repo",
+        href="https://github.com/drpafowler/cintel-07-tdash/",
+        target="_blank",
+    )
+    ui.a(
         "GitHub App",
-        href="https://denisecase.github.io/cintel-07-tdash/",
+        href="https://drpafowler.github.io/cintel-07-tdash/",
         target="_blank",
     )
     ui.a(
         "GitHub Issues",
-        href="https://github.com/denisecase/cintel-07-tdash/issues",
+        href="https://github.com/drpafowler/cintel-07-tdash/issues",
         target="_blank",
     )
     ui.a("PyShiny", href="https://shiny.posit.co/py/", target="_blank")
@@ -41,13 +48,9 @@ with ui.sidebar(title="Filter controls"):
         href="https://shiny.posit.co/py/templates/dashboard/",
         target="_blank",
     )
-    ui.a(
-        "See also",
-        href="https://github.com/denisecase/pyshiny-penguins-dashboard-express",
-        target="_blank",
-    )
 
 
+# Main content
 with ui.layout_column_wrap(fill=False):
     with ui.value_box(showcase=icon_svg("earlybirds")):
         "Number of penguins"
@@ -70,11 +73,13 @@ with ui.layout_column_wrap(fill=False):
         def bill_depth():
             return f"{filtered_df()['bill_depth_mm'].mean():.1f} mm"
 
-
+# Plots
 with ui.layout_columns():
+    # Scatter plot
     with ui.card(full_screen=True):
         ui.card_header("Bill length and depth")
 
+        # Plot
         @render.plot
         def length_depth():
             return sns.scatterplot(
@@ -84,9 +89,11 @@ with ui.layout_columns():
                 hue="species",
             )
 
+    # Data table
     with ui.card(full_screen=True):
-        ui.card_header("Penguin da")
+        ui.card_header("Penguin data")
 
+        # Data table
         @render.data_frame
         def summary_statistics():
             cols = [
@@ -101,7 +108,7 @@ with ui.layout_columns():
 
 #ui.include_css(app_dir / "styles.css")
 
-
+# Reactive functions
 @reactive.calc
 def filtered_df():
     filt_df = df[df["species"].isin(input.species())]
